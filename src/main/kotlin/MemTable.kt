@@ -18,7 +18,7 @@ class MemTable(private val maxSize: Int = MEM_TABLE_DEFAULT_MAX_SIZE) {
     /**
      * @throws [TableOverflowException]
      */
-    fun put(entry: Entry) {
+    fun put(entry: MemTableEntry) {
         val encoded = entry.encode()
         if (arenaOffset + encoded.size > maxSize)
             throw TableOverflowException()
@@ -29,7 +29,7 @@ class MemTable(private val maxSize: Int = MEM_TABLE_DEFAULT_MAX_SIZE) {
         arenaOffset += encoded.size
     }
 
-    fun get(key: ByteArray): Entry? {
+    fun get(key: ByteArray): MemTableEntry? {
         val indexEntry = index.search(key, ComparisonType.LTE) ?: return null
         val (entry, _) = decodeAtOffset(indexEntry.offset)
 
@@ -45,13 +45,13 @@ class MemTable(private val maxSize: Int = MEM_TABLE_DEFAULT_MAX_SIZE) {
         }
     }
 
-    private fun decodeAtOffset(offset: Int): Pair<Entry, Int> {
+    private fun decodeAtOffset(offset: Int): Pair<MemTableEntry, Int> {
         val blockSize = arena.getInt(offset)
         // size of blockSize + size of block
         val totalBlockSize = Int.SIZE_BYTES + blockSize
         val chunk = ByteArray(totalBlockSize)
         arena.get(offset, chunk)
 
-        return Entry.decode(chunk) to totalBlockSize
+        return MemTableEntry.decode(chunk) to totalBlockSize
     }
 }
