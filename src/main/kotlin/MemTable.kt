@@ -18,7 +18,7 @@ class MemTable(private val maxSize: Int = MEM_TABLE_DEFAULT_MAX_SIZE) {
     /**
      * @throws [TableOverflowException]
      */
-    fun put(entry: MemTableEntry) {
+    fun set(entry: MemTableEntry) {
         val encoded = entry.encode()
         if (arenaOffset + encoded.size > maxSize)
             throw TableOverflowException()
@@ -36,7 +36,7 @@ class MemTable(private val maxSize: Int = MEM_TABLE_DEFAULT_MAX_SIZE) {
         return entry
     }
 
-    fun scan() = sequence {
+    fun entries() = sequence {
         var runningOffset = 0
         while (runningOffset < arenaOffset) {
             val (entry, bytesRead) = decodeAtOffset(runningOffset)
@@ -47,11 +47,9 @@ class MemTable(private val maxSize: Int = MEM_TABLE_DEFAULT_MAX_SIZE) {
 
     private fun decodeAtOffset(offset: Int): Pair<MemTableEntry, Int> {
         val blockSize = arena.getInt(offset)
-        // size of blockSize + size of block
-        val totalBlockSize = Int.SIZE_BYTES + blockSize
-        val chunk = ByteArray(totalBlockSize)
+        val chunk = ByteArray(blockSize)
         arena.get(offset, chunk)
 
-        return MemTableEntry.decode(chunk) to totalBlockSize
+        return MemTableEntry.decode(chunk) to blockSize
     }
 }

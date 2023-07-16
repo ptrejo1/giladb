@@ -3,13 +3,6 @@ import java.util.zip.CRC32
 
 class InvalidChecksumException: Exception()
 
-/**
- * byte array representation
- * -----------------------------------------------------------------------
- *                    | ----------------------- header ------------------------ |
- * | block size (Int) | tombstone (Int) | key length (Int) | value length (Int) | key | value | crc32 (Long) |
- * -----------------------------------------------------------------------
- */
 class MemTableEntry(val key: ByteArray, private val value: ByteArray, private val tombstone: Boolean) {
 
     companion object {
@@ -25,7 +18,7 @@ class MemTableEntry(val key: ByteArray, private val value: ByteArray, private va
          * @throws [InvalidChecksumException]
          */
         fun decode(buffer: ByteArray): MemTableEntry {
-            // byte array representation
+            // decode format
             // -----------------------------------------------------------------------
             //                    | ----------------------- header ------------------------ |
             // | block size (Int) | tombstone (Int) | key length (Int) | value length (Int) | key | value | crc32 (Long) |
@@ -54,7 +47,7 @@ class MemTableEntry(val key: ByteArray, private val value: ByteArray, private va
     }
 
     fun encode(): ByteArray {
-        // byte array representation
+        // encode format
         // -----------------------------------------------------------------------
         //                    | ----------------------- header ------------------------ |
         // | block size (Int) | tombstone (Int) | key length (Int) | value length (Int) | key | value | crc32 (Long) |
