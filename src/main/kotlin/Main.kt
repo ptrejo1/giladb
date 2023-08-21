@@ -1,7 +1,8 @@
+import java.nio.charset.Charset
 import kotlin.system.measureNanoTime
 
 fun main() {
-    wal()
+    avl()
 }
 
 fun mem() {
@@ -24,13 +25,21 @@ fun mem() {
 }
 
 fun wal() {
-//    val wal = WAL.create("/Users/phoenix.trejo/IdeaProjects/giladb/wal")
-//    wal.set(WALEntry.create("foo", "{'this': 'is not very fun'}"))
-//    wal.set(WALEntry.create("boo", "{'this': 'is fun'}"))
-//    wal.flush()
+    val g = GilaDB.open("/Users/phoenix.trejo/gila")
+}
 
-    val wal = WAL.existing("/Users/phoenix.trejo/IdeaProjects/giladb/wal/1425010941684.wal")
-    wal.entries().forEach {
-        println(it.key.toString(Charsets.UTF_8))
+fun avl() {
+    val a = AVLTree()
+    val g = listOf(
+        IndexEntry("abc".toByteArray(), 1),
+        IndexEntry("zoo".toByteArray(), 1),
+        IndexEntry("foo".toByteArray(), 1),
+        IndexEntry("abb".toByteArray(), 1),
+        IndexEntry("gob".toByteArray(), 1),
+    )
+    g.forEach { a.insert(it) }
+
+    a.traverse().forEach {
+        println(it.key.toString(Charset.defaultCharset()))
     }
 }

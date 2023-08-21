@@ -1,7 +1,8 @@
 import java.nio.ByteBuffer
 
-class TableOverflowException: Exception()
+class MemTableOverflowException: Exception()
 
+/** 64 MB */
 const val MEM_TABLE_DEFAULT_MAX_SIZE = 64 * 1000 * 1000
 
 /**
@@ -12,16 +13,18 @@ class MemTable(private val maxSize: Int = MEM_TABLE_DEFAULT_MAX_SIZE) {
     private val arena = ByteBuffer.allocateDirect(maxSize)
     private val index = AVLTree()
 
-    private var entriesCount = 0
-    private var arenaOffset = 0
+    var entriesCount = 0
+        private set
+    var arenaOffset = 0
+        private set
 
     /**
-     * @throws [TableOverflowException]
+     * @throws [MemTableOverflowException]
      */
     fun set(entry: MemTableEntry) {
         val encoded = entry.encode()
         if (arenaOffset + encoded.size > maxSize)
-            throw TableOverflowException()
+            throw MemTableOverflowException()
 
         index.insert(IndexEntry(entry.key, arenaOffset))
         arena.put(arenaOffset, encoded)
@@ -37,11 +40,9 @@ class MemTable(private val maxSize: Int = MEM_TABLE_DEFAULT_MAX_SIZE) {
     }
 
     fun entries() = sequence {
-        var runningOffset = 0
-        while (runningOffset < arenaOffset) {
-            val (entry, bytesRead) = decodeAtOffset(runningOffset)
+        index.traverse().forEach {
+            val (entry, _) = decodeAtOffset(it.offset)
             yield(entry)
-            runningOffset += bytesRead
         }
     }
 

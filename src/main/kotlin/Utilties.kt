@@ -1,4 +1,5 @@
 import java.nio.ByteBuffer
+import java.util.*
 import java.util.zip.CRC32
 
 fun toByteArray(vararg items: Int): ByteArray {
@@ -18,4 +19,16 @@ fun toByteArray(vararg items: Long): ByteArray {
 fun CRC32.checksum(vararg items: ByteArray): Long {
     items.forEach { update(it) }
     return value
+}
+
+class GilaByteArray {
+
+    companion object {
+
+        /**
+         * @see Arrays.compare
+         */
+        fun compare(a: ByteArray, b: ByteArray): Int =
+            Arrays.compare(a, b)
+    }
 }

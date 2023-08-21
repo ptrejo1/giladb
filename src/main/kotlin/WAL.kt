@@ -18,7 +18,7 @@ class WAL private constructor(private val file: File) {
          * @throws [WALCreationException]
          */
         fun create(directory: String): WAL {
-            val fileName = "${System.nanoTime() / 1000}.wal"
+            val fileName = "${System.currentTimeMillis()}.wal"
             val file = File("$directory/$fileName")
             if (!file.createNewFile())
                 throw WALCreationException()
@@ -47,13 +47,15 @@ class WAL private constructor(private val file: File) {
     fun entries() = sequence {
         val inputStream = BufferedInputStream(file.inputStream())
         val blockSizeBuffer = ByteBuffer.allocate(Int.SIZE_BYTES)
-        var rc = inputStream.read(blockSizeBuffer.array())
+        var bytesRead = inputStream.read(blockSizeBuffer.array())
 
-        while (rc != -1) {
+        while (bytesRead != -1) {
             val chunk = ByteArray(blockSizeBuffer.getInt(0))
             inputStream.read(chunk)
-            rc = inputStream.read(blockSizeBuffer.array())
+            bytesRead = inputStream.read(blockSizeBuffer.array())
             yield(WALEntry.decode(chunk))
         }
+
+        inputStream.close()
     }
 }

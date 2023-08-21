@@ -3,7 +3,7 @@ import java.util.zip.CRC32
 
 class InvalidChecksumException: Exception()
 
-class MemTableEntry(val key: ByteArray, private val value: ByteArray, private val tombstone: Boolean) {
+class MemTableEntry(val key: ByteArray, val value: ByteArray, val tombstone: Boolean) {
 
     companion object {
 

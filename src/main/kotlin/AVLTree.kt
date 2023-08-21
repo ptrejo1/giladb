@@ -19,7 +19,7 @@ enum class ComparisonType {
 
 class AVLTree {
 
-    var root: Node? = null
+    private var root: Node? = null
 
     /**
      * BST search. if [comparisonType] is GTE, find exact match or closest node gte search key
@@ -34,8 +34,21 @@ class AVLTree {
         root = insert(root, node)
     }
 
+    /** Inorder traversal */
+    fun traverse() = sequence {
+        yieldAll(traverse(root))
+    }
+
+    private fun traverse(root: Node?): Sequence<IndexEntry> = sequence {
+        if (root != null) {
+            yieldAll(traverse(root.left))
+            yield(root.key)
+            yieldAll(traverse(root.right))
+        }
+    }
+
     private fun compare(first: IndexEntry, other: IndexEntry): Int =
-        Arrays.compare(first.key, other.key)
+        GilaByteArray.compare(first.key, other.key)
 
     private fun search(root: Node?, key: IndexEntry, comparisonType: ComparisonType): IndexEntry? {
         if (root == null) return null
