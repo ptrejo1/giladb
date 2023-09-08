@@ -3,6 +3,7 @@ import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.nio.ByteBuffer
+import java.nio.file.Files
 
 class WALCreationException: Exception()
 
@@ -57,5 +58,10 @@ class WAL private constructor(private val file: File) {
         }
 
         inputStream.close()
+    }
+
+    fun delete() {
+        close()
+        Files.deleteIfExists(file.toPath())
     }
 }

@@ -46,6 +46,9 @@ class WALEntry(
 
         fun create(key: String, value: String, tombstone: Boolean = false): WALEntry =
             WALEntry(key.toByteArray(), value.toByteArray(), tombstone, System.currentTimeMillis())
+
+        fun create(memTableEntry: MemTableEntry): WALEntry =
+            WALEntry(memTableEntry.key, memTableEntry.value, memTableEntry.tombstone, System.nanoTime())
     }
 
     fun encode(): ByteArray {

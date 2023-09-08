@@ -5,7 +5,7 @@ import java.nio.file.Paths
 /**
  * Items must be less than 4 KB
  */
-class GilaDB private constructor(private val directory: Path) {
+class GilaDB private constructor(directory: Path) {
 
     companion object {
 
@@ -24,20 +24,18 @@ class GilaDB private constructor(private val directory: Path) {
 
     private val lsmPath = Paths.get(directory.toString(), "lsm")
     private val lsmTree: LSMTree
-    private val walPath = Paths.get(directory.toString(), "wal")
-    private val wal: WAL
 
     init {
-        resetDirectory(walPath)
-        wal = WAL.create(walPath.toString())
-
         resetDirectory(lsmPath)
         lsmTree = LSMTree.create(lsmPath.toString())
     }
 
-    fun get() {}
+    fun get(key: String): MemTableEntry? =
+        lsmTree.get(key.encodeToByteArray())
 
-    fun set() {}
+    fun set(key: String, value: String) =
+        lsmTree.set(key.encodeToByteArray(), value.encodeToByteArray(), false)
 
-    fun delete() {}
+    fun delete(key: String) =
+        lsmTree.set(key.encodeToByteArray(), byteArrayOf(), true)
 }

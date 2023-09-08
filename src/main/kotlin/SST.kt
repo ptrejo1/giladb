@@ -157,10 +157,13 @@ class SST private constructor(
         inputStream.channel.position(position)
         while (inputStream.channel.position() <= position + BLOCK_SIZE) {
             val entry = decode(inputStream.channel) ?: break
-            if (GilaByteArray.compare(key, entry.key) == 0)
+            if (GilaByteArray.compare(key, entry.key) == 0) {
+                inputStream.close()
                 return entry
+            }
         }
 
+        inputStream.close()
         return null
     }
 

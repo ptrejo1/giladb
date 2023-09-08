@@ -67,4 +67,8 @@ class MemTableEntry(val key: ByteArray, val value: ByteArray, val tombstone: Boo
 
         return encoded.array()
     }
+
+    override fun toString(): String {
+        return "${key.decodeToString()} ${value.decodeToString()} $tombstone"
+    }
 }
